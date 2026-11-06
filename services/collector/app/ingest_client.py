@@ -60,6 +60,31 @@ class IngestClient:
         except httpx.HTTPError as exc:
             raise IngestError(f"GET /sources failed: {exc}") from exc
 
+    def fetch_watermarks(self) -> dict[UUID, datetime | None]:
+        """Newest ingested point per enabled source.
+
+        Returns an empty mapping on failure rather than raising: a missing
+        watermark degrades to the old single-interval behaviour, which is worse
+        but still produces current data. Losing catch-up is not worth losing the
+        metrics cycle.
+        """
+        try:
+            with self._client(timeout=15.0) as client:
+                response = client.get("/metrics/watermarks")
+                response.raise_for_status()
+                payload = response.json().get("watermarks", {})
+        except (httpx.HTTPError, ValueError) as exc:
+            log.warning("could not fetch metric watermarks, falling back to one interval: %s", exc)
+            return {}
+
+        out: dict[UUID, datetime | None] = {}
+        for key, value in payload.items():
+            try:
+                out[UUID(key)] = datetime.fromisoformat(value) if value else None
+            except (ValueError, TypeError):
+                continue
+        return out
+
     def post_inventory(self, batch: InventoryBatch) -> dict[str, Any]:
         return self._post("/inventory", batch.model_dump(mode="json"))
 

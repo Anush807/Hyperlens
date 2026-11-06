@@ -95,6 +95,16 @@ class InternalSourceOut(BaseModel):
     verify_ssl: bool
 
 
+class MetricsWatermarks(BaseModel):
+    """Newest ingested metric timestamp per source id, null where none exists.
+
+    The collector has no database of its own, so this is how it learns how far
+    behind it is after an outage.
+    """
+
+    watermarks: dict[uuid.UUID, datetime | None]
+
+
 class IngestResult(BaseModel):
     clusters: int = 0
     hosts: int = 0

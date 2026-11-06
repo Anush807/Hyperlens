@@ -177,9 +177,7 @@ class VSphereAdapter(HypervisorAdapter):
 
     @staticmethod
     def _host_power_state(obj: Any) -> HostPowerState:
-        return normalize_host_power_state(
-            _get(obj, "runtime.powerState"), VSPHERE_POWER_STATES
-        )
+        return normalize_host_power_state(_get(obj, "runtime.powerState"), VSPHERE_POWER_STATES)
 
     def list_vms(self) -> list[VMIn]:
         vms: list[VMIn] = []

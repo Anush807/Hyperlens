@@ -30,6 +30,16 @@ seed: ## Backfill DAYS (default 180) of synthetic metric history, then roll it u
 		--days $(or $(DAYS),180) --interval $(or $(INTERVAL),300)
 	$(API) python -m ml.rollup --days $(or $(DAYS),180)
 
+backfill: ## Fill a known metric gap: make backfill FROM=2026-10-22 TO=2026-11-05
+	@test -n "$(FROM)" || { echo "FROM is required, e.g. make backfill FROM=2026-10-22 TO=2026-11-05"; exit 1; }
+	$(COMPOSE) exec -T collector python -m synthetic.generate_history \
+		--from $(FROM) $(if $(TO),--to $(TO),) $(if $(SRC),--source $(SRC),)
+	$(API) python -m ml.rollup --days $(or $(DAYS),180)
+
+ground-truth: ## Rewrite ground_truth.json without ingesting anything
+	$(COMPOSE) exec -T collector python -m synthetic.generate_history \
+		--days $(or $(DAYS),180) --ground-truth-only
+
 rollup: ## Re-aggregate metrics_daily from raw points
 	$(API) python -m ml.rollup --days $(or $(DAYS),180)
 

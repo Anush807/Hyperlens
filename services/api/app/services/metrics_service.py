@@ -164,6 +164,29 @@ def _as_day(value: datetime) -> datetime:
     return datetime(value.year, value.month, value.day, tzinfo=UTC)
 
 
+async def metrics_watermarks(
+    mongo: AsyncIOMotorDatabase, source_ids: list[str]
+) -> dict[str, datetime | None]:
+    """Newest ingested point per source, or None where a source has none yet.
+
+    This is the collector's memory. The collector owns no database, so after a
+    restart it has no idea how far behind it is - it used to just generate the
+    last poll interval and silently abandon the whole outage. Handing it the
+    high-water mark lets it work out the gap for itself.
+
+    One indexed `find ... sort ... limit 1` per source rather than a `$group`
+    over the whole collection: there are a handful of sources and millions of
+    points, so the seek is orders of magnitude cheaper than the scan.
+    """
+    watermarks: dict[str, datetime | None] = {}
+    for source_id in source_ids:
+        newest = await mongo[METRICS].find_one(
+            {"meta.source_id": source_id}, {"ts": 1}, sort=[("ts", -1)]
+        )
+        watermarks[source_id] = newest["ts"] if newest else None
+    return watermarks
+
+
 async def rollup_daily(mongo: AsyncIOMotorDatabase, *, days: int = 2) -> int:
     """Recompute the last `days` days of `metrics_daily` from raw points.
 

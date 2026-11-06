@@ -185,6 +185,8 @@ make down          Stop it
 make reset         Stop it and delete the data volumes
 make logs SVC=api  Tail logs
 make seed          Backfill DAYS=180 of synthetic metrics, then roll them up
+make backfill      Fill a known gap: make backfill FROM=2026-10-22 TO=2026-11-05
+make ground-truth  Rewrite ground_truth.json without ingesting anything
 make rollup        Re-aggregate metrics_daily from raw points
 make train         Train both models and regenerate findings
 make evaluate      Rewrite docs/ml-evaluation.md from measurements
@@ -222,6 +224,11 @@ measurements rather than impressions.
 
 Raw points land in a Mongo time-series collection at 5-minute resolution; an
 hourly job rolls them into `metrics_daily`, which is all the ML reads.
+
+The collector recovers from downtime: it asks the API where each source left off
+and generates forward from there, a bounded chunk per cycle, so an outage is
+filled in rather than lost. That only covers trailing gaps - a hole with data on
+both sides is invisible to a high-water mark and needs `make backfill`.
 
 ### Anomaly detection
 

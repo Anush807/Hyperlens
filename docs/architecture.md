@@ -96,6 +96,31 @@ Adding a source in the UI is then picked up within one cycle with no restart,
 and a disabled source stops being polled immediately. It costs one request per
 cycle.
 
+### Why the collector asks the API where it left off
+
+The metrics job used to generate exactly one poll interval of history, which
+meant any downtime was lost permanently - a 17-day outage left a 17-day hole and
+nothing noticed. The collector owns no database, so it cannot look this up
+itself; `GET /internal/metrics/watermarks` returns the newest ingested point per
+source and `resolve_metric_window` turns that into the span to generate.
+
+Three details that are not obvious:
+
+- **The window starts one second after the watermark.** That point is already
+  stored, and because timestamps snap to the generation grid, starting *on* it
+  re-emits it - a duplicate every cycle, forever.
+- **A long gap is filled a chunk at a time**, not in one batch. A multi-day hole
+  across ~100 entities is millions of points; each cycle advances by
+  `METRICS_CATCHUP_CHUNK_HOURS` and the hole closes over several minutes.
+- **A gap only counts as a recovery past a threshold.** Points land on a
+  5-minute grid while the poll runs every 60 seconds, so the watermark is
+  routinely minutes old while perfectly healthy. Measuring against the poll
+  interval alone labelled every normal cycle a catch-up.
+
+A watermark is a high-water mark, so this recovers *trailing* gaps only. A hole
+with data on both sides is invisible to it and needs
+`generate_history --from ... --to ...`.
+
 ### Why each source is its own failure domain
 
 One source failing must not stop the others — a Nutanix outage should not

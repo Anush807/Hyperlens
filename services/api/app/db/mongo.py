@@ -80,6 +80,10 @@ async def init_mongo() -> None:
             ("ts", DESCENDING),
         ]
     )
+    # Serves the per-source watermark lookup the collector uses to decide how far
+    # back it must catch up after an outage; without it that is a column scan
+    # over every point ever ingested.
+    await db[METRICS].create_index([("meta.source_id", ASCENDING), ("ts", DESCENDING)])
     await db[METRICS_DAILY].create_index(
         [("entity_type", ASCENDING), ("entity_external_id", ASCENDING), ("date", ASCENDING)],
         unique=True,

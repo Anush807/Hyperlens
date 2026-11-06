@@ -14,9 +14,10 @@ from app.schemas.ingest import (
     InternalSourceOut,
     InventoryBatch,
     MetricsBatch,
+    MetricsWatermarks,
     SourceStatusIn,
 )
-from app.services import ingest_service, source_service
+from app.services import ingest_service, metrics_service, source_service
 
 router = APIRouter(
     prefix="/internal",
@@ -47,6 +48,21 @@ async def ingest_inventory(session: DbSession, batch: InventoryBatch) -> IngestR
     )
     await session.commit()
     return result
+
+
+@router.get("/metrics/watermarks", response_model=MetricsWatermarks)
+async def metrics_watermarks(session: DbSession, mongo: MongoDb) -> MetricsWatermarks:
+    """How far each enabled source has been ingested to.
+
+    The collector calls this at the start of every metrics cycle so it can
+    generate the whole gap since its last point rather than only the last poll
+    interval - which is what used to make an outage unrecoverable.
+    """
+    sources = await source_service.list_sources(session, enabled_only=True)
+    watermarks = await metrics_service.metrics_watermarks(mongo, [str(s.id) for s in sources])
+    return MetricsWatermarks(
+        watermarks={uuid.UUID(key): value for key, value in watermarks.items()}
+    )
 
 
 @router.post("/metrics", response_model=IngestResult)

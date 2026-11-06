@@ -54,14 +54,37 @@ def generate(
     *,
     only_source: str | None = None,
     dry_run: bool = False,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    ground_truth_only: bool = False,
 ) -> dict[str, Any]:
+    if ground_truth_only and only_source is not None:
+        raise SystemExit(
+            "--ground-truth-only describes every source's injected windows, so it "
+            "cannot be combined with --source"
+        )
+    # It computes the windows and writes the file; it never ingests.
+    dry_run = dry_run or ground_truth_only
+
     client = IngestClient()
     provider = SyntheticMetricsProvider(
         Scenarios.load(settings.scenarios_path), interval_seconds=interval_seconds
     )
 
-    until = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
-    since = until - timedelta(days=days)
+    # An explicit range beats `--days`, which can only ever count back from now.
+    # Filling a known hole in the middle of the history needs real endpoints -
+    # without them the only way to cover a gap was to regenerate everything,
+    # re-posting months of points that were already there.
+    if start is not None or end is not None:
+        until = (end or datetime.now(UTC)).replace(minute=0, second=0, microsecond=0)
+        since = (start or (until - timedelta(days=days))).replace(
+            minute=0, second=0, microsecond=0
+        )
+        if since >= until:
+            raise SystemExit(f"--from ({since.isoformat()}) must be before --to ({until.isoformat()})")
+    else:
+        until = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
+        since = until - timedelta(days=days)
 
     sources = client.fetch_sources()
     if only_source:
@@ -119,8 +142,38 @@ def generate(
                 )
 
     totals["elapsed_seconds"] = round(time.perf_counter() - started, 1)
-    _write_ground_truth(ground_truth)
     totals["anomaly_windows"] = len(ground_truth["anomaly_windows"])
+
+    # Only a full regeneration may write ground truth.
+    #
+    # This file is the entire injected anomaly set, and `python -m ml.evaluate`
+    # scores against it. A dry run or a targeted gap fill covers a slice - one
+    # source, a day and a half - and writing it from there silently replaced 180
+    # days of windows across 95 entities with that slice's handful. The
+    # evaluation then reported against truth that described almost nothing.
+    #
+    # A partial refill never needs to: the windows are positioned from a fixed
+    # epoch, so the existing file already describes the range being refilled.
+    partial = [
+        reason
+        for reason, applies in (
+            ("dry run", dry_run),
+            ("single source", only_source is not None),
+            ("explicit range", start is not None or end is not None),
+        )
+        if applies
+    ]
+    if ground_truth_only:
+        # The whole point of the flag: recompute the truth file and nothing else.
+        _write_ground_truth(ground_truth)
+        totals["ground_truth"] = "written (ground-truth-only)"
+    elif partial:
+        totals["ground_truth"] = f"not written ({', '.join(partial)})"
+        log.info(
+            "leaving ground_truth.json alone", extra={"reason": totals["ground_truth"]}
+        )
+    else:
+        _write_ground_truth(ground_truth)
     return totals
 
 
@@ -141,6 +194,20 @@ def _write_ground_truth(payload: dict[str, Any]) -> None:
         log.info("wrote ground truth", extra={"paths": written})
 
 
+def _parse_when(value: str | None, flag: str) -> datetime | None:
+    """Accept a date or a datetime, and assume UTC when no offset is given."""
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise SystemExit(
+            f"{flag}: {value!r} is not an ISO date or datetime (e.g. 2026-10-22 or "
+            "2026-10-22T06:00)"
+        ) from exc
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO, format='{"level":"%(levelname)s","message":"%(message)s"}'
@@ -155,11 +222,45 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--chunk", type=int, default=5000)
     parser.add_argument("--source", default=None, help="limit to one source name or id")
-    parser.add_argument("--dry-run", action="store_true", help="generate but do not ingest")
+    parser.add_argument(
+        "--from",
+        dest="start",
+        default=None,
+        metavar="WHEN",
+        help="start of the range, e.g. 2026-10-22 or 2026-10-22T06:00. Overrides --days",
+    )
+    parser.add_argument(
+        "--to",
+        dest="end",
+        default=None,
+        metavar="WHEN",
+        help="end of the range (default: now). Use with --from to fill a known gap",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="generate and validate but ingest nothing, and leave ground_truth.json alone",
+    )
+    parser.add_argument(
+        "--ground-truth-only",
+        action="store_true",
+        help=(
+            "rewrite ground_truth.json from the scenarios and current inventory without "
+            "ingesting anything. Use after a targeted refill, or to rebuild the file "
+            "that `python -m ml.evaluate` scores against"
+        ),
+    )
     args = parser.parse_args(argv)
 
     result = generate(
-        args.days, args.interval, args.chunk, only_source=args.source, dry_run=args.dry_run
+        args.days,
+        args.interval,
+        args.chunk,
+        only_source=args.source,
+        dry_run=args.dry_run,
+        start=_parse_when(args.start, "--from"),
+        end=_parse_when(args.end, "--to"),
+        ground_truth_only=args.ground_truth_only,
     )
     print(json.dumps(result, indent=2))
     return 0

@@ -95,6 +95,21 @@ contract. `services/collector/tests/test_schema_parity.py` keeps them honest.
   the interval grid. Breaking any of these makes live-collected data disagree
   with the backfill it is appended to, and silently invalidates the ML
   evaluation.
+- **The metrics job generates from the API's watermark, not from `now - poll`.**
+  `GET /internal/metrics/watermarks` tells the collector where each source left
+  off; `resolve_metric_window` turns that into the span to produce. It used to
+  generate one poll interval, so any outage was lost for good. A long gap is
+  filled a chunk per cycle (`METRICS_CATCHUP_CHUNK_HOURS`) and the window starts
+  *one second after* the watermark — starting on it re-emits a point that is
+  already stored.
+- **A watermark cannot see an interior hole.** It is a high-water mark, so it
+  only recovers trailing gaps. A hole with data on both sides needs
+  `generate_history --from ... --to ...` (`make backfill`).
+- **Only a full regeneration may write `ground_truth.json`.** A dry run, a
+  `--source` filter or an explicit range all refuse. That file is the entire
+  injected anomaly set and `ml.evaluate` scores against it; writing it from a
+  slice replaced 180 days of windows with one. `--ground-truth-only` rebuilds it
+  without ingesting (`make ground-truth`).
 - **ML reads only `metrics_daily`**, never raw `metrics` — except anomaly
   detection, which builds hourly windows from raw points.
 - **Anomaly features are entity-relative** (deviation from the same hour on
@@ -109,6 +124,10 @@ contract. `services/collector/tests/test_schema_parity.py` keeps them honest.
   response model, then run `make types`.
 - **The collector runs one gunicorn worker on purpose.** APScheduler is
   in-process; two workers would double every poll.
+- **Collector logs must carry their `extra=` fields.** `app/__init__.py` has a
+  real `JsonFormatter`; it used to be a hardcoded format string that emitted
+  only level/logger/message and silently dropped every structured field the
+  service attached. `test_log_records_carry_their_extra_fields` guards it.
 
 ### ML artifacts
 

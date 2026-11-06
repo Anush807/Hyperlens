@@ -30,7 +30,8 @@ class RunResult:
     source_name: str
     ok: bool
     error: str | None = None
-    counts: dict[str, int] = field(default_factory=dict)
+    # Floats as well as ints: catch-up reports gap sizes in hours.
+    counts: dict[str, float] = field(default_factory=dict)
     started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     finished_at: datetime | None = None
 
@@ -115,10 +116,98 @@ def _to_entities(vms: list[Any], hosts: list[Any]) -> list[MetricEntity]:
     return entities
 
 
+@dataclass
+class MetricWindow:
+    """The span a metrics cycle will generate, and why."""
+
+    since: datetime
+    until: datetime
+    catching_up: bool = False
+    gap_hours: float = 0.0
+    remaining_hours: float = 0.0
+    truncated: bool = False
+
+
+def resolve_metric_window(
+    watermark: datetime | None,
+    now: datetime,
+    *,
+    window_seconds: int | None = None,
+    chunk_hours: int | None = None,
+    max_catchup_days: int | None = None,
+) -> MetricWindow:
+    """Decide what span to generate, given where this source left off.
+
+    Three cases:
+
+    * An explicit `window_seconds` wins. That is what a manual trigger and the
+      tests use, and it keeps the old behaviour available deliberately.
+    * No watermark at all - a brand new source. Generate one poll interval.
+      Backfilling a new source's history is `generate_history`'s job, not
+      something a 60-second poll should start doing unprompted.
+    * A watermark exists. Generate from it forward, which is the fix: whatever
+      the collector was down for is still ahead of the watermark and gets
+      produced instead of silently skipped.
+
+    A long gap is capped twice. `chunk_hours` bounds one cycle so a multi-day
+    hole does not become one enormous batch - successive cycles walk forward
+    until it closes. `max_catchup_days` is the point where automatic recovery
+    stops being sensible at all; beyond it the window is clamped and the caller
+    is told to run the backfill tool.
+    """
+    poll = timedelta(seconds=window_seconds or settings.poll_metrics_seconds)
+    if window_seconds is not None or not settings.metrics_catchup_enabled:
+        return MetricWindow(since=now - poll, until=now)
+
+    if watermark is None:
+        return MetricWindow(since=now - poll, until=now)
+
+    # Start just after the watermark, not at it. The watermark *is* a generated
+    # point and it is already stored, so beginning there would re-emit it: the
+    # grid snapping floors to the same slot and ships a duplicate every cycle.
+    since = watermark + timedelta(seconds=1)
+    gap = now - watermark
+
+    # Only a gap larger than a couple of generation intervals is a recovery
+    # worth announcing. Points land on a 5-minute grid while the poll runs every
+    # 60 seconds, so in healthy operation the watermark is routinely minutes
+    # old - measuring against the poll interval alone labelled every normal
+    # cycle a catch-up and logged a warning for it.
+    quiet = timedelta(
+        seconds=max(settings.poll_metrics_seconds, settings.metrics_interval_seconds * 2)
+    )
+    chunk = timedelta(hours=chunk_hours or settings.metrics_catchup_chunk_hours)
+    cap = timedelta(days=max_catchup_days or settings.metrics_max_catchup_days)
+
+    truncated = False
+    if gap > cap:
+        since = now - cap
+        gap = cap
+        truncated = True
+
+    until = min(now, since + chunk)
+    return MetricWindow(
+        since=since,
+        until=until,
+        catching_up=gap > quiet,
+        gap_hours=round(gap.total_seconds() / 3600, 2),
+        remaining_hours=round((now - until).total_seconds() / 3600, 2),
+        truncated=truncated,
+    )
+
+
 def collect_metrics(
-    source: SourceConfig, client: IngestClient, *, window_seconds: int | None = None
+    source: SourceConfig,
+    client: IngestClient,
+    *,
+    window_seconds: int | None = None,
+    watermark: datetime | None = None,
 ) -> RunResult:
-    """Generate and ship the points for the window that just elapsed."""
+    """Generate and ship the points for the outstanding window.
+
+    Normally that is the interval that just elapsed. After an outage it is
+    everything since this source's last ingested point, in chunks.
+    """
     result = RunResult(source_id=source.id, source_name=source.name, ok=False)
     try:
         entities = _entity_cache.get(source.id)
@@ -128,14 +217,35 @@ def collect_metrics(
             return result
 
         provider = get_metrics_provider(interval_seconds=settings.metrics_interval_seconds)
-        until = datetime.now(UTC)
-        since = until - timedelta(seconds=window_seconds or settings.poll_metrics_seconds)
-        points = provider.collect(entities, since, until)
+        window = resolve_metric_window(watermark, datetime.now(UTC), window_seconds=window_seconds)
+        points = provider.collect(entities, window.since, window.until)
         sent = client.post_metrics_chunked(source.id, points)
 
         result.ok = True
         result.counts = {"points": sent, "entities": len(entities)}
-        log.info("metrics collected", extra={"source": source.name, **result.counts})
+        if window.catching_up:
+            result.counts["catchup_gap_hours"] = window.gap_hours
+            result.counts["catchup_remaining_hours"] = window.remaining_hours
+            log.warning(
+                "catching up after a metrics gap",
+                extra={
+                    "source": source.name,
+                    "gap_hours": window.gap_hours,
+                    "generated_from": window.since.isoformat(),
+                    "generated_to": window.until.isoformat(),
+                    "remaining_hours": window.remaining_hours,
+                    "points": sent,
+                },
+            )
+            if window.truncated:
+                log.error(
+                    "metrics gap exceeds metrics_max_catchup_days; the remainder will not be "
+                    "generated automatically - run `python -m synthetic.generate_history "
+                    "--from <date> --to <date>` to fill it",
+                    extra={"source": source.name, "cap_days": settings.metrics_max_catchup_days},
+                )
+        else:
+            log.info("metrics collected", extra={"source": source.name, **result.counts})
     except IngestError as exc:
         result.error = str(exc)[:1000]
         log.warning(
@@ -174,7 +284,14 @@ def run_metrics_cycle(client: IngestClient | None = None) -> list[dict[str, Any]
     except IngestError as exc:
         log.error("could not fetch sources from the API: %s", exc)
         return [{"ok": False, "error": str(exc)}]
-    return [collect_metrics(source, client).to_dict() for source in sources]
+
+    # One watermark call per cycle, not per source. Degrades to {} on failure,
+    # which falls back to generating a single interval.
+    watermarks = client.fetch_watermarks() if settings.metrics_catchup_enabled else {}
+    return [
+        collect_metrics(source, client, watermark=watermarks.get(source.id)).to_dict()
+        for source in sources
+    ]
 
 
 def cached_entity_count() -> int:

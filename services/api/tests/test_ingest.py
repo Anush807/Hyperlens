@@ -290,3 +290,101 @@ async def test_metrics_for_an_unknown_source_is_a_clean_404(client, service_head
         headers=service_header,
     )
     assert response.status_code == 404
+
+
+# --- metric watermarks (the collector's catch-up input) -------------------
+
+
+async def test_watermarks_require_the_service_token(client, source):
+    assert (await client.get("/internal/metrics/watermarks")).status_code == 401
+
+
+async def test_watermark_is_null_for_a_source_with_no_metrics(client, source, service_header):
+    response = await client.get("/internal/metrics/watermarks", headers=service_header)
+
+    assert response.status_code == 200
+    assert response.json()["watermarks"] == {str(source.id): None}
+
+
+async def test_watermark_is_the_newest_ingested_point(client, source, service_header, mongo):
+    newest = datetime.now(UTC).replace(microsecond=0)
+    points = [
+        {
+            "entity_type": "vm",
+            "entity_external_id": "v1",
+            "ts": (newest - timedelta(minutes=5 * i)).isoformat(),
+            "cpu_pct": 10.0,
+            "mem_pct": 50.0,
+            "disk_iops": 100.0,
+            "disk_latency_ms": 2.0,
+            "net_kbps": 500.0,
+        }
+        for i in range(4)
+    ]
+    await client.post(
+        "/internal/metrics",
+        json={"source_id": str(source.id), "points": points},
+        headers=service_header,
+    )
+
+    body = (await client.get("/internal/metrics/watermarks", headers=service_header)).json()
+
+    assert datetime.fromisoformat(body["watermarks"][str(source.id)]) == newest
+
+
+async def test_watermarks_are_reported_per_source(client, source, service_header, session, mongo):
+    """Two sources must not share a watermark; a gap on one is not a gap on the other."""
+    from app.schemas.sources import SourceCreate
+    from app.services.source_service import create_source
+
+    other = await create_source(
+        session,
+        SourceCreate(
+            name="nutanix-prod",
+            type="nutanix",
+            endpoint="http://prism:9440",
+            username="u",
+            password="p",
+        ),
+    )
+    await session.commit()
+
+    ts = datetime.now(UTC).replace(microsecond=0)
+    await client.post(
+        "/internal/metrics",
+        json={
+            "source_id": str(source.id),
+            "points": [
+                {
+                    "entity_type": "vm",
+                    "entity_external_id": "v1",
+                    "ts": ts.isoformat(),
+                    "cpu_pct": 1.0,
+                    "mem_pct": 1.0,
+                    "disk_iops": 1.0,
+                    "disk_latency_ms": 1.0,
+                    "net_kbps": 1.0,
+                }
+            ],
+        },
+        headers=service_header,
+    )
+
+    body = (await client.get("/internal/metrics/watermarks", headers=service_header)).json()
+
+    assert datetime.fromisoformat(body["watermarks"][str(source.id)]) == ts
+    assert body["watermarks"][str(other.id)] is None
+
+
+async def test_disabled_sources_are_not_reported(client, source, service_header, session):
+    from sqlalchemy import update
+
+    from app.db.models import HypervisorSource
+
+    await session.execute(
+        update(HypervisorSource).where(HypervisorSource.id == source.id).values(is_enabled=False)
+    )
+    await session.commit()
+
+    body = (await client.get("/internal/metrics/watermarks", headers=service_header)).json()
+    assert body["watermarks"] == {}
