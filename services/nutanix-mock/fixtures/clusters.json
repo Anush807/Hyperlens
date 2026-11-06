@@ -1,0 +1,37 @@
+[
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-cluster-01",
+      "resources": {
+        "nodes": {
+          "hypervisor_server_list": [
+            {
+              "type": "AHV",
+              "version": "20230302.100173"
+            }
+          ]
+        },
+        "config": {
+          "software_map": {
+            "NOS": {
+              "version": "6.8.1"
+            }
+          }
+        },
+        "network": {
+          "external_ip": "10.20.30.40"
+        }
+      }
+    },
+    "spec": {
+      "name": "nx-cluster-01",
+      "resources": {}
+    },
+    "metadata": {
+      "kind": "cluster",
+      "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+      "spec_version": 3
+    }
+  }
+]

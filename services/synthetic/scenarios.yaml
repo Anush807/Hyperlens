@@ -1,0 +1,157 @@
+# Which VMs behave how, and where the known anomalies are (spec 7.6).
+#
+# Every profile here exists to exercise one part of the platform:
+#   growing          -> forecasting has something to find
+#   idle / overprovisioned / hot -> right-sizing rules have targets
+#   anomalous        -> anomaly detection has ground truth to be scored against
+#
+# Assignment is deterministic: a VM whose name contains an `assignments` key
+# gets that profile; everything else is drawn from `distribution` using a stable
+# hash of the VM's external id, so the mix is reproducible across runs.
+
+default_profile: diurnal
+
+distribution:
+  steady: 0.22
+  diurnal: 0.28
+  growing: 0.15
+  idle: 0.10
+  overprovisioned: 0.10
+  hot: 0.07
+  anomalous: 0.08
+
+# Name-based overrides so a demo always has at least one of each interesting
+# case. The nx-* names are deliberate: vcsim issues 1-vCPU / 32 MB VMs, so only
+# the Nutanix fixtures are large enough for a downsize to be actionable.
+assignments:
+  DC0_H0_VM0: growing
+  DC0_H0_VM1: idle
+  DC0_C0_RP0_VM0: anomalous
+  DC0_C0_RP0_VM1: hot
+  DC0_C1_RP0_VM0: overprovisioned
+  nx-vm-001: growing
+  nx-vm-002: idle
+  nx-vm-003: anomalous
+  nx-vm-004: hot
+  nx-vm-005: overprovisioned
+  nx-vm-010: overprovisioned
+  nx-vm-012: overprovisioned
+
+profiles:
+  # Flat baseline with noise.
+  steady:
+    cpu_base: 32
+    cpu_amplitude: 0
+    cpu_noise: 3.0
+    mem_base: 48
+    mem_noise: 2.0
+    iops_base: 120
+    latency_base: 2.0
+    net_base: 600
+    weekend_factor: 1.0
+    _total_days: 180
+
+  # Business-hours peak, quieter at weekends.
+  diurnal:
+    cpu_base: 30
+    cpu_amplitude: 22
+    cpu_noise: 3.5
+    mem_base: 55
+    mem_noise: 2.5
+    iops_base: 220
+    latency_base: 2.4
+    net_base: 900
+    weekend_factor: 0.55
+
+  # Diurnal plus a steady climb - the case forecasting has to catch.
+  # The climb is a 180-day sawtooth: at ~0.28%/day a trend cannot run much
+  # longer than that before saturating at 100%, so it restarts. Every window the
+  # platform evaluates (30-day detection, 14-day right-sizing, 30-day forecast
+  # holdout) is shorter than one ramp.
+  growing:
+    cpu_base: 22
+    cpu_amplitude: 18
+    cpu_noise: 3.0
+    cpu_trend_per_day: 0.28
+    mem_base: 40
+    mem_trend_per_day: 0.15
+    mem_noise: 2.0
+    iops_base: 250
+    latency_base: 2.6
+    net_base: 1100
+    weekend_factor: 0.7
+
+  # Under 5% CPU and almost no traffic -> the `idle` rule must fire.
+  idle:
+    cpu_base: 2.2
+    cpu_amplitude: 0.6
+    cpu_noise: 0.5
+    mem_base: 18
+    mem_noise: 1.0
+    iops_base: 6
+    latency_base: 1.2
+    net_base: 12
+    weekend_factor: 1.0
+
+  # Busy enough not to be idle, far too many vCPUs -> `downsize_cpu`.
+  overprovisioned:
+    cpu_base: 11
+    cpu_amplitude: 5
+    cpu_noise: 1.5
+    mem_base: 22
+    mem_noise: 1.5
+    iops_base: 60
+    latency_base: 1.8
+    net_base: 350
+    weekend_factor: 0.9
+
+  # Sustained high CPU -> `upsize_cpu`.
+  hot:
+    cpu_base: 86
+    cpu_amplitude: 8
+    cpu_noise: 2.5
+    mem_base: 88
+    mem_noise: 2.0
+    iops_base: 800
+    latency_base: 5.5
+    net_base: 2600
+    weekend_factor: 0.95
+
+  # Normal diurnal behaviour with the windows below injected on top.
+  anomalous:
+    cpu_base: 34
+    cpu_amplitude: 20
+    cpu_noise: 3.0
+    mem_base: 52
+    mem_noise: 2.5
+    iops_base: 240
+    latency_base: 2.5
+    net_base: 950
+    weekend_factor: 0.6
+
+# Injected windows, measured back from the end of the generated history.
+# generate_history.py resolves these to absolute timestamps and writes them to
+# ground_truth.json, which `python -m ml.evaluate` scores against.
+# Injected windows. Each kind recurs on its own cycle, positioned from a fixed
+# epoch rather than from "now" - so a 180-day backfill and a 60-second live poll
+# place the very same anomaly at the very same absolute time. The cycles are
+# deliberately coprime-ish so the four kinds rarely coincide.
+# generate_history.py resolves them to absolute timestamps and writes them to
+# ground_truth.json, which `python -m ml.evaluate` scores against.
+anomalies:
+  - kind: cpu_spike
+    cycle_days: 37
+    duration_hours: 3
+    magnitude: 50
+  - kind: latency_storm
+    cycle_days: 43
+    duration_hours: 5
+    magnitude: 40
+  - kind: memory_leak
+    cycle_days: 53
+    duration_hours: 8
+    magnitude: 38
+  - kind: network_flood
+    cycle_days: 61
+    duration_hours: 4
+    magnitude: 45

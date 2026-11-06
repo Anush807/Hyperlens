@@ -1,0 +1,1793 @@
+{
+  "info": {
+    "_postman_id": "a7f3c9d1-6b24-4e58-9f0a-2d1e8c5b7a41",
+    "name": "HVOps API",
+    "description": "Hybrid Virtualization Ops Platform - every public endpoint.\n\n## Getting started\n1. Select the **HVOps local** environment (postman/hvops.postman_environment.json).\n2. Run **Auth / Login**. It stores `accessToken` and `refreshToken` as collection\n   variables, so everything after it is authenticated automatically.\n3. Run **Sources / List sources** and copy an id into `sourceId`, then\n   **Inventory / List VMs** and copy an id into `vmId`. The requests that need an\n   id read these variables.\n\nRoles are ordered admin > operator > viewer; each request notes what it needs.\nThe `/internal/*` endpoints are deliberately absent: they are service-to-service\nonly, authenticated with `X-Service-Token`, and excluded from the OpenAPI schema.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "email",
+      "value": "admin@hvops.local"
+    },
+    {
+      "key": "password",
+      "value": "admin123"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "sourceId",
+      "value": ""
+    },
+    {
+      "key": "vmId",
+      "value": ""
+    },
+    {
+      "key": "hostId",
+      "value": ""
+    },
+    {
+      "key": "clusterId",
+      "value": ""
+    },
+    {
+      "key": "datastoreId",
+      "value": ""
+    },
+    {
+      "key": "anomalyId",
+      "value": ""
+    },
+    {
+      "key": "recommendationId",
+      "value": ""
+    },
+    {
+      "key": "conversationId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "OAuth2 password flow. Access tokens last 15 minutes; refresh tokens rotate on use.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Public. Form-encoded, per the OAuth2 password flow. Stores both tokens.",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{email}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('returns an access token', () => pm.expect(body.access_token).to.be.a('string'));",
+                  "// Stored so every later request in the collection is authenticated.",
+                  "pm.collectionVariables.set('accessToken', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "viewer+. Who the access token belongs to."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Public. Single-use: the presented token is revoked and replaced. Replaying one revokes the whole family.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('accessToken', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "viewer+. Revokes the refresh token. Returns 204.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "admin only. A viewer or operator gets 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operator@hvops.local\",\n  \"password\": \"operator-password\",\n  \"role\": \"operator\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sources",
+      "description": "Hypervisor sources. Passwords are Fernet-encrypted at rest and only decrypted for the collector.",
+      "item": [
+        {
+          "name": "List sources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sources"
+              ]
+            },
+            "description": "viewer+. Includes last run status and error."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "if (body.length) { pm.collectionVariables.set('sourceId', body[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add vSphere source",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sources"
+              ]
+            },
+            "description": "admin only. The password is never echoed back.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"vcsim-lab\",\n  \"type\": \"vsphere\",\n  \"endpoint\": \"vcsim:8989\",\n  \"username\": \"user\",\n  \"password\": \"pass\",\n  \"verify_ssl\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('sourceId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Nutanix source",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sources"
+              ]
+            },
+            "description": "admin only.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"nutanix-mock\",\n  \"type\": \"nutanix\",\n  \"endpoint\": \"http://nutanix-mock:9440\",\n  \"username\": \"admin\",\n  \"password\": \"admin\",\n  \"verify_ssl\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enable or disable a source",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sources/{{sourceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sources",
+                "{{sourceId}}"
+              ]
+            },
+            "description": "admin only. Send `password` to rotate the stored credential; it is never written to the audit log.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_enabled\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sync now",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sources/{{sourceId}}/sync",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sources",
+                "{{sourceId}}",
+                "sync"
+              ]
+            },
+            "description": "operator+. Calls the collector's /collect/trigger. Returns 503 if the collector is unreachable."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "item": [
+        {
+          "name": "Dashboard summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/inventory/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inventory",
+                "summary"
+              ]
+            },
+            "description": "viewer+. Counts, totals and per-cluster allocation ratios. Cached for 60s."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('has per-cluster allocation', () => pm.expect(body.per_cluster).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List VMs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vms?limit=25&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vms"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "disabled": false
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "disabled": false
+                },
+                {
+                  "key": "q",
+                  "value": "web",
+                  "disabled": true
+                },
+                {
+                  "key": "power_state",
+                  "value": "on",
+                  "disabled": true
+                },
+                {
+                  "key": "cluster_id",
+                  "value": "{{clusterId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "include_deleted",
+                  "value": "false",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "viewer+. Filter by source, cluster, host, power state or a free-text query."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('paginated envelope', () => pm.expect(body).to.include.all.keys('items','total','limit','offset'));",
+                  "if (body.items.length) { pm.collectionVariables.set('vmId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get VM detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vms/{{vmId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vms",
+                "{{vmId}}"
+              ]
+            },
+            "description": "viewer+. Specs plus latest metrics, open anomalies and open recommendations."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List hosts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hosts?limit=25&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hosts"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "disabled": false
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('paginated envelope', () => pm.expect(body).to.include.all.keys('items','total','limit','offset'));",
+                  "if (body.items.length) { pm.collectionVariables.set('hostId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List clusters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/clusters?limit=25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clusters"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('paginated envelope', () => pm.expect(body).to.include.all.keys('items','total','limit','offset'));",
+                  "if (body.items.length) { pm.collectionVariables.set('clusterId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List datastores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/datastores?limit=25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "datastores"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('paginated envelope', () => pm.expect(body).to.include.all.keys('items','total','limit','offset'));",
+                  "if (body.items.length) { pm.collectionVariables.set('datastoreId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "VM metrics (hourly)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/metrics/vm/{{vmId}}?resolution=hourly",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics",
+                "vm",
+                "{{vmId}}"
+              ],
+              "query": [
+                {
+                  "key": "resolution",
+                  "value": "hourly",
+                  "disabled": false
+                },
+                {
+                  "key": "from",
+                  "value": "2026-01-01T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2026-12-31T00:00:00Z",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "viewer+. resolution=raw|hourly|daily. Raw is clamped to 7 days."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "VM metrics (daily)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/metrics/vm/{{vmId}}?resolution=daily",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics",
+                "vm",
+                "{{vmId}}"
+              ],
+              "query": [
+                {
+                  "key": "resolution",
+                  "value": "daily",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "viewer+. Served from the pre-aggregated metrics_daily collection."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Host metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/metrics/host/{{hostId}}?resolution=hourly",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics",
+                "host",
+                "{{hostId}}"
+              ],
+              "query": [
+                {
+                  "key": "resolution",
+                  "value": "hourly",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Anomalies",
+      "item": [
+        {
+          "name": "List anomalies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/anomalies?status=open&days=30&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "anomalies"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "open",
+                  "disabled": false
+                },
+                {
+                  "key": "days",
+                  "value": "30",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "disabled": false
+                },
+                {
+                  "key": "entity_id",
+                  "value": "{{vmId}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('paginated envelope', () => pm.expect(body).to.include.all.keys('items','total','limit','offset'));",
+                  "if (body.items.length) { pm.collectionVariables.set('anomalyId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Acknowledge an anomaly",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/anomalies/{{anomalyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "anomalies",
+                "{{anomalyId}}"
+              ]
+            },
+            "description": "operator+. Viewers get 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"acknowledged\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resolve an anomaly",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/anomalies/{{anomalyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "anomalies",
+                "{{anomalyId}}"
+              ]
+            },
+            "description": "operator+.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Forecasts and capacity",
+      "item": [
+        {
+          "name": "VM forecasts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/forecasts/vm/{{vmId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "forecasts",
+                "vm",
+                "{{vmId}}"
+              ]
+            },
+            "description": "viewer+. Latest LSTM and seasonal-naive forecast per metric, plus which model won the holdout."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cluster capacity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/capacity/clusters/{{clusterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capacity",
+                "clusters",
+                "{{clusterId}}"
+              ]
+            },
+            "description": "viewer+. days_to_threshold plus current overcommit."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Datastore capacity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/capacity/datastores/{{datastoreId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capacity",
+                "datastores",
+                "{{datastoreId}}"
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "List recommendations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations?status=open&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recommendations"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "open",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "disabled": false
+                },
+                {
+                  "key": "kind",
+                  "value": "idle",
+                  "disabled": true
+                },
+                {
+                  "key": "cluster_id",
+                  "value": "{{clusterId}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "viewer+. Totals cover every open row, not just the page."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('reports reclaimable totals', () => pm.expect(body).to.include.all.keys('total_reclaimable_vcpus','total_reclaimable_memory_mb'));",
+                  "if (body.items.length) { pm.collectionVariables.set('recommendationId', body.items[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dismiss a recommendation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/{{recommendationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recommendations",
+                "{{recommendationId}}"
+              ]
+            },
+            "description": "operator+.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"dismissed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assistant",
+      "description": "Read-only, backed by a local model. Needs the `llm` compose profile; returns 503 otherwise.",
+      "item": [
+        {
+          "name": "Start a conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assistant/conversations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assistant",
+                "conversations"
+              ]
+            },
+            "description": "viewer+.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Capacity questions\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('conversationId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List conversations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assistant/conversations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assistant",
+                "conversations"
+              ]
+            },
+            "description": "viewer+."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get a conversation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assistant/conversations/{{conversationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assistant",
+                "conversations",
+                "{{conversationId}}"
+              ]
+            },
+            "description": "viewer+. Includes tool calls, so the UI can show its working."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send a message (SSE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assistant/conversations/{{conversationId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assistant",
+                "conversations",
+                "{{conversationId}}",
+                "messages"
+              ]
+            },
+            "description": "viewer+. Returns a text/event-stream: `tool` events per tool call, `token` events for the answer, then `done`. Postman shows the raw stream rather than parsing it.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Which VMs are idle?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 or 503 when the model is down', () => pm.expect([200,503]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ML admin",
+      "item": [
+        {
+          "name": "ML status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "status"
+              ]
+            },
+            "description": "admin only. Loaded model versions, last run times and holdout metrics."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Run the ML jobs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/run?anomaly_days=7&history_days=180",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "run"
+              ],
+              "query": [
+                {
+                  "key": "anomaly_days",
+                  "value": "7",
+                  "disabled": false
+                },
+                {
+                  "key": "history_days",
+                  "value": "180",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "admin only. Queues detection, forecasting and right-sizing as a background task."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reload artifacts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/reload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "reload"
+              ]
+            },
+            "description": "admin only. Re-reads ML_ARTIFACT_DIR after a training run, without a restart."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Public. Liveness plus a Postgres and Mongo probe."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-container-default",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      },
+      "resources": {
+        "capacity_bytes": 43980465111040,
+        "free_bytes": 16712576742195,
+        "replication_factor": 2,
+        "compression_enabled": true
+      }
+    },
+    "spec": {
+      "name": "nx-container-default",
+      "resources": {
+        "capacity_bytes": 43980465111040
+      }
+    },
+    "metadata": {
+      "kind": "storage_container",
+      "uuid": "8fafe569-9469-5e38-900c-9a10e9d61f13",
+      "spec_version": 1
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-container-fast",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      },
+      "resources": {
+        "capacity_bytes": 21990232555520,
+        "free_bytes": 12974237207756,
+        "replication_factor": 2,
+        "compression_enabled": true
+      }
+    },
+    "spec": {
+      "name": "nx-container-fast",
+      "resources": {
+        "capacity_bytes": 21990232555520
+      }
+    },
+    "metadata": {
+      "kind": "storage_container",
+      "uuid": "338d8431-fd4c-5818-8cf1-bf44ccb8bb0f",
+      "spec_version": 1
+    }
+  }
+]

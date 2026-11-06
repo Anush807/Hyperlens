@@ -1,0 +1,110 @@
+[
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-node-01",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "num_cpu_cores": 24,
+        "num_cpu_sockets": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248R",
+        "cpu_frequency_hz": 3000000000,
+        "memory_capacity_mib": 393216,
+        "hypervisor": {
+          "hypervisor_full_name": "Nutanix AHV",
+          "ip": "10.20.30.50"
+        },
+        "host_type": "HYPER_CONVERGED",
+        "power_state": "ON",
+        "block": {
+          "block_serial_number": "BLK0001"
+        }
+      }
+    },
+    "spec": {
+      "name": "nx-node-01",
+      "resources": {}
+    },
+    "metadata": {
+      "kind": "host",
+      "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+      "spec_version": 1
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-node-02",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "num_cpu_cores": 24,
+        "num_cpu_sockets": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248R",
+        "cpu_frequency_hz": 3000000000,
+        "memory_capacity_mib": 393216,
+        "hypervisor": {
+          "hypervisor_full_name": "Nutanix AHV",
+          "ip": "10.20.30.51"
+        },
+        "host_type": "HYPER_CONVERGED",
+        "power_state": "ON",
+        "block": {
+          "block_serial_number": "BLK0002"
+        }
+      }
+    },
+    "spec": {
+      "name": "nx-node-02",
+      "resources": {}
+    },
+    "metadata": {
+      "kind": "host",
+      "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+      "spec_version": 1
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-node-03",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "num_cpu_cores": 24,
+        "num_cpu_sockets": 2,
+        "cpu_model": "Intel(R) Xeon(R) Gold 6248R",
+        "cpu_frequency_hz": 3000000000,
+        "memory_capacity_mib": 393216,
+        "hypervisor": {
+          "hypervisor_full_name": "Nutanix AHV",
+          "ip": "10.20.30.52"
+        },
+        "host_type": "HYPER_CONVERGED",
+        "power_state": "ON",
+        "block": {
+          "block_serial_number": "BLK0003"
+        }
+      }
+    },
+    "spec": {
+      "name": "nx-node-03",
+      "resources": {}
+    },
+    "metadata": {
+      "kind": "host",
+      "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+      "spec_version": 1
+    }
+  }
+]

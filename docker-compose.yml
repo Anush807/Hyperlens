@@ -1,0 +1,133 @@
+# HVOps V1 stack. Every image tag is pinned on purpose - see docs/architecture.md.
+name: hvops
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mongo:
+    image: mongo:7.0.14
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  vcsim:
+    image: vmware/vcsim:v0.46.2
+    command: ["-l", "0.0.0.0:8989", "-dc", "1", "-cluster", "2", "-host", "3", "-vm", "20", "-ds", "4"]
+    ports:
+      - "${VCSIM_PORT:-8989}:8989"
+
+  nutanix-mock:
+    build:
+      context: ./services/nutanix-mock
+    environment:
+      NUTANIX_USER: ${NUTANIX_USER}
+      NUTANIX_PASSWORD: ${NUTANIX_PASSWORD}
+    ports:
+      - "${NUTANIX_PORT:-9440}:9440"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:9440/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  llm:
+    # Pinned llama.cpp server build. Swap for the -cuda variant when a GPU is
+    # present. ggml-org publishes a tag per upstream build and prunes old ones,
+    # so if this tag has gone, list the current ones with:
+    #   curl -s "https://ghcr.io/token?scope=repository:ggml-org/llama.cpp:pull&service=ghcr.io" \
+    #     | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])'
+    # and query /v2/ggml-org/llama.cpp/tags/list with it.
+    image: ghcr.io/ggml-org/llama.cpp:server-b11723
+    profiles: ["llm"]
+    command: >
+      -m /models/${LLM_MODEL_FILE}
+      --alias ${LLM_MODEL}
+      --jinja
+      -c ${LLM_CTX}
+      --host 0.0.0.0 --port 8080
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - "${LLM_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 120s
+
+  api:
+    build:
+      context: ./services/api
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      MONGO_URL: ${MONGO_URL}
+      COLLECTOR_URL: http://collector:5000
+    volumes:
+      - ./ml_artifacts:/ml_artifacts
+      - ./docs:/app/docs
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  collector:
+    build:
+      context: ./services
+      dockerfile: collector/Dockerfile
+    env_file: .env
+    volumes:
+      # Shared with the API so generate_history can drop ground_truth.json
+      # where `python -m ml.evaluate` will find it.
+      - ./ml_artifacts:/ml_artifacts
+    ports:
+      - "${COLLECTOR_PORT:-5001}:5000"
+    depends_on:
+      api:
+        condition: service_healthy
+      nutanix-mock:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  mongodata:

@@ -1,0 +1,116 @@
+# Assistant evaluation set (spec 10.6).
+#
+# Twenty questions with the tool call each one should make. The runner scores
+# two things separately:
+#
+#   tool-selection accuracy - did the model reach for the right tool at all
+#   argument accuracy       - were the arguments right, given the right tool
+#
+# Only the arguments listed under `args` are checked; anything else the model
+# adds is ignored, because a model that also passes `limit: 10` is not wrong.
+# `any_of` accepts more than one defensible tool for a genuinely ambiguous
+# question. Record the result per model in docs/ml-evaluation.md - this is the
+# evidence for the model choice, not a vibe.
+
+cases:
+  - question: Which VMs are idle?
+    tool: list_recommendations
+    args:
+      kind: idle
+
+  - question: How many virtual machines do we have?
+    tool: get_inventory_summary
+
+  - question: How much CPU can I reclaim on cluster DC0_C0?
+    tool: list_recommendations
+    args:
+      cluster_name: DC0_C0
+
+  - question: When will datastore LocalDS_0 fill up?
+    tool: get_capacity_forecast
+    args:
+      datastore_name: LocalDS_0
+
+  - question: What is the capacity outlook for cluster DC0_C1?
+    tool: get_capacity_forecast
+    args:
+      cluster_name: DC0_C1
+
+  - question: Show me the details of VM nx-vm-001.
+    tool: get_vm_details
+    args:
+      vm_name: nx-vm-001
+
+  - question: How busy has nx-vm-004 been over the last 30 days?
+    tool: get_metric_stats
+    args:
+      name: nx-vm-004
+      metric: cpu_pct
+      days: 30
+
+  - question: What anomalies happened this week?
+    tool: list_anomalies
+    args:
+      days: 7
+
+  - question: Are there any open anomalies right now?
+    tool: list_anomalies
+    args:
+      status: open
+
+  - question: Find every powered-off virtual machine.
+    tool: search_vms
+    args:
+      power_state: "off"
+
+  - question: Which VMs have at least 8 vCPUs?
+    tool: search_vms
+    args:
+      min_vcpus: 8
+
+  - question: List the VMs whose name contains "web".
+    tool: search_vms
+    args:
+      name_contains: web
+
+  - question: What is the memory utilisation of nx-vm-002 over the past fortnight?
+    tool: get_metric_stats
+    args:
+      name: nx-vm-002
+      metric: mem_pct
+      days: 14
+
+  - question: Which VMs are over-provisioned on CPU?
+    tool: list_recommendations
+    args:
+      kind: downsize_cpu
+
+  - question: Which VMs need more memory?
+    tool: list_recommendations
+    args:
+      kind: upsize_mem
+
+  - question: What is our total vCPU overcommit ratio?
+    tool: get_inventory_summary
+
+  - question: How many VMs are running in cluster nx-cluster-01?
+    any_of: [get_inventory_summary, search_vms]
+    args:
+      cluster_name: nx-cluster-01
+
+  - question: What is the disk latency trend on nx-vm-003?
+    tool: get_metric_stats
+    args:
+      name: nx-vm-003
+      metric: disk_latency_ms
+
+  - question: Show me anomalies from the last 30 days that are still open.
+    tool: list_anomalies
+    args:
+      status: open
+      days: 30
+
+  - question: Which recommendations would free the most memory?
+    tool: list_recommendations
+    args:
+      kind: downsize_mem

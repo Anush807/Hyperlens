@@ -1,0 +1,1602 @@
+[
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-001",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "CentOS Linux 8",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "d3d1b831-632d-5bcd-953b-01602cac349f",
+            "disk_size_bytes": 214748364800,
+            "disk_size_mib": 204800,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "86f4025c-38a4-512f-a5ab-5f021351a033",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-001",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "7a9f61ab-be47-5cde-a8a6-7d51c6784632",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-002",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Ubuntu 22.04 LTS",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "9bfa3c5d-b5b4-593c-a5ce-578bdb2510db",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "008f5f1d-bd3b-5f38-a2dd-3d1a9c9ef8b0",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-002",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "2bbe98e6-9da0-56ec-be4f-02d2ff3a375f",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-003",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "Windows Server 2022",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "dd9f4e17-db12-5243-bbda-593032628aea",
+            "disk_size_bytes": 429496729600,
+            "disk_size_mib": 409600,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "2376e522-4500-56d2-b643-0a1687077aa7",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-003",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "fb1df295-6538-5b61-ab03-f87ebe0350c2",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-004",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "RHEL 9",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "1690a41e-754a-5730-b9e5-17ae315a42a8",
+            "disk_size_bytes": 42949672960,
+            "disk_size_mib": 40960,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "d9eb3fd9-d306-5fce-914b-42999d3b05a8",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-004",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "cdd7648a-b5fd-51c5-9186-1dd4e4141663",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-005",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Debian 12",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "daa3d307-cbdc-5ce6-9bcb-97906b33f655",
+            "disk_size_bytes": 64424509440,
+            "disk_size_mib": 61440,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "72ebc3cf-47df-5e5e-9963-4a9b520d5b1c",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-005",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "8f659a21-bf06-596c-af93-3780921387c6",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-006",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "CentOS Linux 8",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "2fe2a6d6-9b7c-5f08-add8-4d27362e8382",
+            "disk_size_bytes": 128849018880,
+            "disk_size_mib": 122880,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "bd98154f-bf9c-55b0-abf8-15307ac3a7e4",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-006",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "e9ba3c4a-ca4c-5fac-8bac-57ca401cc7db",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-007",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "Ubuntu 22.04 LTS",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "d5008787-ec0c-52ec-b78b-4887badeb808",
+            "disk_size_bytes": 214748364800,
+            "disk_size_mib": 204800,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "dff53817-3643-5e3c-b7c8-d1092b3c1292",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-007",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "d773a51f-6e52-5023-b97c-668084184848",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-008",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Windows Server 2022",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "deac9f22-a211-5aab-9176-d6c83d8255f8",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "4aff358f-f55b-5d0f-be17-fe7c62e7573a",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": false
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-008",
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "b2e6ce45-226b-5f05-8aea-de1f7686d83e",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-009",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "RHEL 9",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "fde9d442-6f99-54ad-8fc7-81ed5ab853ec",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "352e3bf9-5825-5fcf-8833-be39537f2cb4",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-009",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "623f1729-1dd7-5b29-8d49-65e21cc3ee8a",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-010",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "Debian 12",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "b051249d-91c1-52a8-9eea-cb2ec76b14b9",
+            "disk_size_bytes": 429496729600,
+            "disk_size_mib": 409600,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "34dd4e93-1570-58fb-9388-c1b65712d504",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-010",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "4bbfd10e-74ef-5fad-a933-d762e81fb315",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-011",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "CentOS Linux 8",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "152238be-f5f2-5e7a-9c47-1a92630f39d6",
+            "disk_size_bytes": 42949672960,
+            "disk_size_mib": 40960,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "a8b68944-7a19-53df-9693-a0f2bd2074cd",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-011",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "ae950d32-7f51-520b-a30d-7ae547e5b470",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-012",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "Ubuntu 22.04 LTS",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "4dc3f8ca-e0b9-55e2-89f8-17ee27f6bf7d",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "d3b1ae8b-5e1b-5811-9c9c-33fdedd1ca0c",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-012",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "2d975a93-1992-5d0f-87ab-7f5f664d4771",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-013",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "Windows Server 2022",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "96b5d08b-0879-54be-8ceb-2e91ec8ebc06",
+            "disk_size_bytes": 64424509440,
+            "disk_size_mib": 61440,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "6e70d8d1-cc31-5370-b402-448d01e64714",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-013",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "e72282f4-f1fe-5809-b90c-15d92b0ce3e2",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-014",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "RHEL 9",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "eda29fce-2629-5e4c-a28b-d86c70ccca7b",
+            "disk_size_bytes": 42949672960,
+            "disk_size_mib": 40960,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "72b2454b-b241-5169-ab9a-3ddc4353ac80",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-014",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "059d63b3-0d9f-5ebc-afde-0d8ab723b8a3",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-015",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "Debian 12",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "2345678c-d374-5e7c-8261-b1f7323c5303",
+            "disk_size_bytes": 429496729600,
+            "disk_size_mib": 409600,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "473b956b-6bad-5f41-a216-8be7797914d6",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": false
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-015",
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "1e4b56af-5c05-5fb4-ae4d-1d816b285b2e",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-016",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "CentOS Linux 8",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "13a959e3-c9cd-576a-b408-a1ee91386678",
+            "disk_size_bytes": 214748364800,
+            "disk_size_mib": 204800,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "b1cf504d-cec1-5039-b133-441707636a02",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-016",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "33c7422e-1df7-5df3-a765-644bd21e19fe",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-017",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Ubuntu 22.04 LTS",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "44d92619-67e7-5cbd-b0f4-74cf8da9a9ad",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "fd2c10b8-b226-58d7-b982-8ba6a08f30d6",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-017",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "6724db1b-80de-5027-b8c7-77d48201c7bb",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-018",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "Windows Server 2022",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "2460d9c1-a5b2-5ec7-ba89-61f025e6e817",
+            "disk_size_bytes": 128849018880,
+            "disk_size_mib": 122880,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "9de0e474-1068-57b0-b27d-d506366a6c5a",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-018",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "2b7bd441-6bdd-544b-b05a-3180a48728b2",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-019",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "SUSPENDED",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "RHEL 9",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "4434756b-8024-5393-bbaf-eb2224879d85",
+            "disk_size_bytes": 429496729600,
+            "disk_size_mib": 409600,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "b74a0d61-66be-5629-be49-ad30e1dde044",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": false
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-019",
+      "resources": {
+        "power_state": "SUSPENDED",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "5ac83059-a6a4-53e0-b820-4e2c42a25ae9",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-020",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Debian 12",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "46c93a42-4326-547d-bf48-a5d6dd917529",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "1e9e2ba4-5ff6-5f27-9bab-a241e209bc59",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-020",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 32768
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "8e0a1cfd-67ec-5444-9824-c0f714c8b418",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-021",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "CentOS Linux 8",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "aa23abc1-a5d2-5b59-86cb-b7217b244828",
+            "disk_size_bytes": 214748364800,
+            "disk_size_mib": 204800,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "4890f0ea-746a-5352-ba72-ba071c1b745a",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-021",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 2,
+        "num_vcpus_per_socket": 8,
+        "memory_size_mib": 65536
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "4831af10-c3e6-5445-a7dc-a3e93703102e",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-022",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "Ubuntu 22.04 LTS",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "70b07de4-c1be-5469-86e7-d58e4e7d729c",
+            "disk_size_bytes": 85899345920,
+            "disk_size_mib": 81920,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "546ad24d-ce09-5112-9091-309d1d3a4890",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": false
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-022",
+      "resources": {
+        "power_state": "OFF",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 4096
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "15612ea1-d10d-5254-b622-34736bb3e7ae",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-023",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "31bd1231-c441-5385-9a73-b964a1b39e33",
+          "name": "nx-node-02"
+        },
+        "guest_os": "Windows Server 2022",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "bceec45b-47e4-53ef-b99f-71143e9ab790",
+            "disk_size_bytes": 42949672960,
+            "disk_size_mib": 40960,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "456582bd-da96-5ddb-a6db-1bd25e6024b8",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-023",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 2,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "6a8e0da6-eb7e-579d-abcc-feb50d03d003",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-024",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "bb96c727-f346-5b0d-9283-b8fdf0a201e2",
+          "name": "nx-node-03"
+        },
+        "guest_os": "RHEL 9",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "13d0beaf-540c-548f-a0b2-690d0ddb608a",
+            "disk_size_bytes": 42949672960,
+            "disk_size_mib": 40960,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "cd9a344c-b228-5856-bb21-d607e45f7b18",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-024",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 8192
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "448e6ca4-6ad6-5806-b0c9-3aef9deb8815",
+      "spec_version": 2,
+      "categories": {}
+    }
+  },
+  {
+    "status": {
+      "state": "COMPLETE",
+      "name": "nx-vm-025",
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d",
+        "name": "nx-cluster-01"
+      },
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384,
+        "host_reference": {
+          "kind": "host",
+          "uuid": "a2217bf5-fe3f-5658-8022-fe10055f0c6a",
+          "name": "nx-node-01"
+        },
+        "guest_os": "Debian 12",
+        "hypervisor_type": "AHV",
+        "disk_list": [
+          {
+            "uuid": "da6b53df-c595-51c4-8298-0521ef89e5e1",
+            "disk_size_bytes": 128849018880,
+            "disk_size_mib": 122880,
+            "device_properties": {
+              "device_type": "DISK",
+              "disk_address": {
+                "device_index": 0,
+                "adapter_type": "SCSI"
+              }
+            }
+          }
+        ],
+        "nic_list": [
+          {
+            "uuid": "991f8155-fe3d-5332-ae47-f0c0d410a9f2",
+            "nic_type": "NORMAL_NIC",
+            "is_connected": true
+          }
+        ]
+      }
+    },
+    "spec": {
+      "name": "nx-vm-025",
+      "resources": {
+        "power_state": "ON",
+        "num_sockets": 1,
+        "num_vcpus_per_socket": 4,
+        "memory_size_mib": 16384
+      },
+      "cluster_reference": {
+        "kind": "cluster",
+        "uuid": "f0709030-1e12-5eba-aa12-1468654e306d"
+      }
+    },
+    "metadata": {
+      "kind": "vm",
+      "uuid": "e9a04b7c-a5c6-51bc-ad77-c69a0aa1baa0",
+      "spec_version": 2,
+      "categories": {}
+    }
+  }
+]
